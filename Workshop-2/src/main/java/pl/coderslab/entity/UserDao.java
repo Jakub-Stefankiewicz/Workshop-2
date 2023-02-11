@@ -16,18 +16,26 @@ public class UserDao {
 
 
 
-    public User create(User user){
-        try (Connection conn= DbUtil.getConnection()){
-            PreparedStatement statement=conn.prepareStatement(CREATE_USER_QUERY, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, user.getUserName());
-            statement.setString(2, user.getEmail());
-            statement.setString(3, hashPassword(user.getPassword()));
-            statement.executeUpdate();
-            ResultSet resultSet=statement.getGeneratedKeys();
-            if (resultSet.next()){
-                user.setId(resultSet.getInt(1));
+    public User read(int userId){
+        try (Connection conn= DbUtil.getConnection()) {
+
+            try {
+                User user = new User();
+                PreparedStatement prstmt = conn.prepareStatement("SELECT * FROM users WHERE id=?");
+                prstmt.setString(1, Integer.toString(userId));
+                ResultSet rs = prstmt.executeQuery();
+                if (rs.next()) {
+                    user.setId(rs.getInt("id"));
+                    user.setUserName(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPassword(rs.getString("password"));
+                }
+                return user;
+
+            } catch (NullPointerException e) {
+                return null;
             }
-            return user;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
