@@ -5,6 +5,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.DbUtil;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public class UserDao {
@@ -105,5 +106,33 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+
+    public User[] findAll(){
+        try (Connection conn= DbUtil.getConnection()) {
+            User[] userArr=new User[0];
+            User user=new User();
+            Statement stmt=conn.createStatement();
+            ResultSet rs=stmt.executeQuery("SELECT * FROM users");
+            while (rs.next()){
+                user.setId(rs.getInt(1));
+                user.setEmail(rs.getString(2));
+                user.setUserName(rs.getString(3));
+                user.setPassword(rs.getString(4));
+                userArr=addToArray(user,userArr);
+            }
+            return userArr;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private User[] addToArray(User u, User[] users) {
+        User[] tmpUsers = Arrays.copyOf(users, users.length + 1);
+        tmpUsers[users.length] = u;
+        return tmpUsers;
+    }
+
+
 
 }
