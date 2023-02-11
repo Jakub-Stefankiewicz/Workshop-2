@@ -21,6 +21,13 @@ public class UserDao {
     private static final String DELETE_USER_QUERY=
             "DELETE FROM users WHERE id=?";
 
+    private static final String READ_USER_QUERY="SELECT * FROM users WHERE id=?";
+
+    private static final String FIND_MAX_ID_QUERY="SELECT MAX(id) FROM users";
+
+    private static final String FIND_ALL_QUERY="SELECT * FROM users";
+
+
     public String hashPassword(String password){
         return BCrypt.hashpw(password,BCrypt.gensalt());
     }
@@ -53,7 +60,7 @@ public class UserDao {
 
             try {
                 User user = new User();
-                PreparedStatement prstmt = conn.prepareStatement("SELECT * FROM users WHERE id=?");
+                PreparedStatement prstmt = conn.prepareStatement(READ_USER_QUERY);
                 prstmt.setString(1, Integer.toString(userId));
                 ResultSet rs = prstmt.executeQuery();
                 if (rs.next()) {
@@ -80,7 +87,7 @@ public class UserDao {
             PreparedStatement statement=conn.prepareStatement(UPDATE_USER_QUERY);
             statement.setString(1, user.getEmail());
             statement.setString(2, user.getUserName());
-            statement.setString(3, hashPassword(user.getPassword()));
+            statement.setString(3, this.hashPassword(user.getPassword()));
             statement.setString(4, Integer.toString(id));
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -91,7 +98,7 @@ public class UserDao {
     public void delete(int userId){
         try (Connection conn= DbUtil.getConnection()) {
             Statement stmt=conn.createStatement();
-            ResultSet rs=stmt.executeQuery("SELECT MAX(id) FROM users");
+            ResultSet rs=stmt.executeQuery(FIND_MAX_ID_QUERY);
             rs.next();
             int maxId=rs.getInt(1);
             if (userId<=maxId) {
@@ -112,7 +119,7 @@ public class UserDao {
             User[] userArr=new User[0];
             User user=new User();
             Statement stmt=conn.createStatement();
-            ResultSet rs=stmt.executeQuery("SELECT * FROM users");
+            ResultSet rs=stmt.executeQuery(FIND_ALL_QUERY);
             while (rs.next()){
                 user.setId(rs.getInt(1));
                 user.setEmail(rs.getString(2));
