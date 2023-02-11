@@ -6,12 +6,11 @@ import pl.coderslab.entity.UserDao;
 public class MainTest {
     public static void main(String[] args) {
         UserDao userDao= new UserDao();
-        User userread= userDao.read(5);
-        System.out.println(userread.toString());
-        userDao.update(userread);
-        userread.setUserName("name2");
-        userread.setEmail("email2@wp.pl");
-        userread.setPassword("gggg2222");
-        userDao.update(userread);
+        User uzytkownik = new User();
+        uzytkownik.setUserName("dddd22");
+        uzytkownik.setEmail("jdj222d@dd.pl");
+        uzytkownik.setPassword("dsdsd2222fsd");
+        userDao.create(uzytkownik);
+
     }
 }
